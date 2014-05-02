@@ -44,5 +44,13 @@ public class UsageFeeCalculatorTest {
 		Double expectedFee = (double)30000;
 		assertEquals(expectedFee, feeCalculated);
 	}
+	
+	@Test
+	public void testCalculateFeeForValidInvoiceAmount3 () {
+		Double invoiceAmount = (double) 600000;
+		Double feeCalculated = feeCalculatorTester.calculateUsageFee(invoiceAmount);
+		Double expectedFee = (double)65000;
+		assertEquals(expectedFee, feeCalculated);
+	}
 
 }
