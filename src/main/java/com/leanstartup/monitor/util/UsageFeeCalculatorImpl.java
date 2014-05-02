@@ -10,9 +10,32 @@ public class UsageFeeCalculatorImpl implements UsageFeeCalculator {
 			throw new IllegalArgumentException("Invalid invoice amount. Invoice amount needs to be a positive value.");
 		}
 		
+		// Calculate the Usage Fee
 		usageFee = UsageFeeCalculationHelper.calculateFee(invoiceAmount);
 		
 		return usageFee;
+	}
+
+	public Double calculateUsageFee (Double costBasis, Double invoiceAmount) throws IllegalArgumentException {
+		Double usageFee = null;
+
+		// Validate the given invoice amount and cost basis
+		if (costBasis < 0) {
+			throw new IllegalArgumentException("Invalid cost basis. Cost Basis needs to be a positive value.");
+		}
+		if (invoiceAmount < 0) {
+			throw new IllegalArgumentException("Invalid invoice amount. Invoice amount needs to be a positive value.");
+		}
+
+		// Calculate the Usage Fee
+		Double previousInvoiceUsageFee = UsageFeeCalculationHelper.calculateFee(costBasis);
+		Double totalInvoiceUsageFee = UsageFeeCalculationHelper.calculateFee(costBasis + invoiceAmount);
+		usageFee = totalInvoiceUsageFee - previousInvoiceUsageFee;
+		if (usageFee < 0) {
+			throw new RuntimeException("Invalid Usage Fee calculated.");
+		}
+
+		return usageFee;		
 	}
 
 	/*

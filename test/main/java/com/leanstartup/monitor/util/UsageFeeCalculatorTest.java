@@ -2,12 +2,8 @@ package com.leanstartup.monitor.util;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.leanstartup.monitor.util.UsageFeeCalculator;
-import com.leanstartup.monitor.util.UsageFeeCalculatorImpl;
 
 public class UsageFeeCalculatorTest {
 	
@@ -18,17 +14,19 @@ public class UsageFeeCalculatorTest {
 		feeCalculatorTester = new UsageFeeCalculatorImpl();
 	}
 
-	@SuppressWarnings("unused")
 	@Test
 	public void testCalculateFeeForInvalidInvoiceAmount() {
-		Double invoiceAmount = (double) -60000;
+		Double invoiceAmount = (double) -65000;
+		Double feeCalculated = null;
 		try {
-			Double feeCalculated = feeCalculatorTester.calculateUsageFee(invoiceAmount);
+			feeCalculated = feeCalculatorTester.calculateUsageFee(invoiceAmount);
 		} catch (IllegalArgumentException exception) {
 			assertEquals("Invalid invoice amount. Invoice amount needs to be a positive value.", exception.getMessage());
+		} finally {
+			assertNull(feeCalculated);
 		}
-	}	
-	
+	}
+
 	@Test
 	public void testCalculateFeeForValidInvoiceAmount1() {
 		Double invoiceAmount = (double) 50000;
@@ -52,5 +50,27 @@ public class UsageFeeCalculatorTest {
 		Double expectedFee = (double)65000;
 		assertEquals(expectedFee, feeCalculated);
 	}
+	
+	@Test
+	public void testCalculateFeeForInvalidCostBasis() {
+		Double costBasis = (double) -350000;
+		Double invoiceAmount = (double) 1200000;
+		Double feeCalculated = null;
+		try {
+			feeCalculated = feeCalculatorTester.calculateUsageFee(costBasis, invoiceAmount);
+		} catch (IllegalArgumentException exception) {
+			assertEquals("Invalid cost basis. Cost Basis needs to be a positive value.", exception.getMessage());
+		} finally {
+			assertNull(feeCalculated);
+		}
+	}
 
+	@Test
+	public void testCalculateFeeForValidCostBasisAndInvoiceAmount () {
+		Double costBasis = (double) 400000;
+		Double invoiceAmount = (double) 200000;
+		Double feeCalculated = feeCalculatorTester.calculateUsageFee(costBasis, invoiceAmount);
+		Double expectedFee = (double)15000;
+		assertEquals(expectedFee, feeCalculated);
+	}
 }
