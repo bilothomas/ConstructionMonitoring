@@ -1,6 +1,17 @@
 package com.leanstartup.monitor.util;
 
+import com.leanstartup.monitor.model.FeeRange;
+
 public class UsageFeeCalculatorImpl implements UsageFeeCalculator {
+
+	private FeeRange[] feeRanges = null;
+
+	public UsageFeeCalculatorImpl() {
+	}
+
+	public UsageFeeCalculatorImpl(FeeRange[] feeRanges) {
+		this.feeRanges = feeRanges;
+	}
 	
 	public Double calculateUsageFee (Double invoiceAmount) throws IllegalArgumentException {
 		Double usageFee = null;
@@ -11,7 +22,7 @@ public class UsageFeeCalculatorImpl implements UsageFeeCalculator {
 		}
 		
 		// Calculate the Usage Fee
-		usageFee = UsageFeeCalculationHelper.calculateFee(invoiceAmount);
+		usageFee = UsageFeeCalculationHelper.calculateFee(invoiceAmount, feeRanges);
 		
 		return usageFee;
 	}
@@ -28,8 +39,8 @@ public class UsageFeeCalculatorImpl implements UsageFeeCalculator {
 		}
 
 		// Calculate the Usage Fee
-		Double previousInvoiceUsageFee = UsageFeeCalculationHelper.calculateFee(costBasis);
-		Double totalInvoiceUsageFee = UsageFeeCalculationHelper.calculateFee(costBasis + invoiceAmount);
+		Double previousInvoiceUsageFee = UsageFeeCalculationHelper.calculateFee(costBasis, feeRanges);
+		Double totalInvoiceUsageFee = UsageFeeCalculationHelper.calculateFee(costBasis + invoiceAmount, feeRanges);
 		usageFee = totalInvoiceUsageFee - previousInvoiceUsageFee;
 		if (usageFee < 0) {
 			throw new RuntimeException("Invalid Usage Fee calculated.");
@@ -44,38 +55,29 @@ public class UsageFeeCalculatorImpl implements UsageFeeCalculator {
 	private static class UsageFeeCalculationHelper {
 
 		/*
-		 * Usage Fee is assessed as 
-		 *  Range 1: 20% of the invoice amount from  $0 to $100000
-		 *  Range 2: 10% of the invoice amount above $100000 and up to $500000
-		 *  Range 3: 5% for the remaining amount of the invoice amount
+		 * Usage Fee is assessed as per the fee ranges passed by the caller.
 		 *  
 		 */
-		public static Double calculateFee (Double invoiceAmount) {
+		public static Double calculateFee (Double invoiceAmount, FeeRange[] feeRanges) {
 			
-			// As of now three value ranges are supported.
-			// Whenever a new range is added the below arrays need to be updated 
-			// to include the values for its minimum range, maximum range and percentage
-			Double[] rangeMinimum = {0.0, 100000.0, 500000.0};
-			Double[] rangeMaximum = {100000.0, 500000.0, Double.MAX_VALUE};
-			Double[] percentage = {20.0, 10.0, 5.0};
-
 			boolean hasRemainingAmount = true;
 			int range = 0;
 			Double usageFee = 0.0;
 			while (hasRemainingAmount) {
+				
 				Double currentTierAmount = 0.0;
 				
-				if (invoiceAmount > rangeMaximum[range]) {
-					currentTierAmount = (rangeMaximum[range] - rangeMinimum[range]);
+				if (invoiceAmount > feeRanges[range].getRangeMaximum()) {
+					currentTierAmount = (feeRanges[range].getRangeMaximum() - feeRanges[range].getRangeMinimum());
 				} else {
-					currentTierAmount = invoiceAmount - rangeMinimum[range];
+					currentTierAmount = invoiceAmount - feeRanges[range].getRangeMinimum();
 					hasRemainingAmount = false;
 				}
 				
-				usageFee += currentTierAmount * (percentage[range] / 100);
+				usageFee += currentTierAmount * (feeRanges[range].getRangePercentage() / 100);
 				range++;				
 			}
 			return usageFee;
-		}
+		}		
 	}
 }
