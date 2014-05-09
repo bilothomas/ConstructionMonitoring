@@ -14,19 +14,6 @@ public class UsageFeeCalculatorTest {
 	FeeRange[] twoTierFeeRanges = null;
 	FeeRange[] threeTierFeeRanges = null;
 	FeeRange[] fourTierFeeRanges = null;
-/*	FeeRange[] twoTierFeeRanges = {new FeeRange(0.0, 100000.0, 20.0),
-			new FeeRange(100000.0, Double.MAX_VALUE, 10.0)};
-	FeeRange[] twoTierFeeRanges = {new FeeRange(0.0, 100000.0, 20.0),
-			new FeeRange(100000.0, Double.MAX_VALUE, 10.0)};
-
-	FeeRange[] threeTierFeeRanges = {new FeeRange(0.0, 100000.0, 20.0),
-			new FeeRange(100000.0, 500000.0, 10.0), 
-			new FeeRange(500000.0, Double.MAX_VALUE, 5.0)};
-
-	FeeRange[] fourTierFeeRanges = {new FeeRange(0.0, 100000.0, 20.0), 
-			new FeeRange(100000.0, 500000.0, 10.0),
-			new FeeRange(500000.0, 700000.0, 5.0),
-			new FeeRange(700000.0, Double.MAX_VALUE, 2.5)};*/
 
 	@Before
 	public void setUp() throws Exception {
@@ -93,11 +80,6 @@ public class UsageFeeCalculatorTest {
 
 	@Test
 	public void testCalculateFeeForValidInvoiceAmount4 () {
-/*		FeeRange[] fourTierFeeRanges = {new FeeRange(0.0, 100000.0, 20.0), 
-					new FeeRange(100000.0, 500000.0, 10.0),
-					new FeeRange(500000.0, 700000.0, 5.0),
-					new FeeRange(700000.0, Double.MAX_VALUE, 2.5)};
-*/
 		Double invoiceAmount = (double) 800000;
 		feeCalculatorTester = new UsageFeeCalculatorImpl(fourTierFeeRanges);
 		Double feeCalculated = feeCalculatorTester.calculateUsageFee(invoiceAmount);
